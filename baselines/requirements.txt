@@ -1,5 +1,5 @@
 ray[rllib]
-pytorch
+torch
 tensorflow_probability
 tensorflow
 tensorboard

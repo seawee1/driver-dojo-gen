@@ -9,7 +9,7 @@ from ray.air import RunConfig
 from driver_dojo.core.config import Config
 from driver_dojo.core.env import DriverDojoEnv
 from driver_dojo.core.types import *
-from baselines.callbacks import CustomCallback
+from callbacks import CustomCallback
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--num-cpus", type=int, default=24)
@@ -71,7 +71,7 @@ if __name__ == '__main__':
         framework='torch',
     )
     config = config.rollouts(
-        num_rollout_workers=args.num_cpus,
+        num_rollout_workers=args.num_cpus - 1,
         num_envs_per_worker=1,
         rollout_fragment_length='auto',
         horizon=500,
@@ -86,6 +86,7 @@ if __name__ == '__main__':
     tuner = tune.Tuner(
         "PPO",
         run_config=RunConfig(
+            name=f"PPO_custom_env_{num_maps}_{num_traffic}_{num_tasks}_{args.env_seed}",
             stop=dict(
                 timesteps_total=100000000,
             ),

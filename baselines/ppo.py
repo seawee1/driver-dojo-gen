@@ -21,6 +21,7 @@ parser.add_argument("--no-traffic", action="store_true")
 
 if __name__ == '__main__':
     args = parser.parse_args()
+    print(args)
     num_maps, num_traffic, num_tasks = [int(x) for x in args.task.split('_')]
 
     config = Config()

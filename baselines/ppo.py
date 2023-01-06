@@ -48,6 +48,7 @@ if __name__ == '__main__':
     c.scenario.num_maps = num_maps
     c.scenario.num_traffic = num_traffic
     c.scenario.num_tasks = num_tasks
+    c.scenario.generation_threading = False
 
     if args.no_traffic:
         c.scenario.traffic_spawn = False

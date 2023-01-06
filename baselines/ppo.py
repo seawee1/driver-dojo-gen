@@ -20,7 +20,6 @@ parser.add_argument("--env-seed", type=int, default=0)
 parser.add_argument("--env-seed-offset", type=int, default=0)
 parser.add_argument("--task", type=str, default="1_1_1")
 parser.add_argument("--no-traffic", action="store_true")
-parser.add_argument("--timesteps", type=int, default=1000000000)
 parser.add_argument("--as-test", action="store_true")
 parser.add_argument("--exp_path", type=str, default=None)
 parser.add_argument('--num-test', type=int, default=1000)
@@ -98,7 +97,7 @@ if __name__ == '__main__':
             run_config=RunConfig(
                 name=f"PPO_custom_env_{num_maps}_{num_traffic}_{num_tasks}_{args.env_seed}_{args.env_seed_offset}",
                 stop=dict(
-                    timesteps_total=args.timesteps,
+                    timesteps_total=1000000000,
                 ),
                 verbose=1,
                 checkpoint_config=air.CheckpointConfig(

@@ -17,6 +17,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--num-cpus", type=int, default=24)
 parser.add_argument("--num-gpus", type=int, default=1)
 parser.add_argument("--env-seed", type=int, default=0)
+parser.add_argument("--env-seed-offset", type=int, default=0)
 parser.add_argument("--task", type=str, default="1_1_1")
 parser.add_argument("--no-traffic", action="store_true")
 parser.add_argument("--timesteps", type=int, default=1000000000)
@@ -39,6 +40,7 @@ if __name__ == '__main__':
     c.scenario.traffic_spawn_period = 1.0
     c.scenario.behavior_dist = False
     c.scenario.ego_init = True
+    c.scenario.seed_offset = args.env_seed_offset
     c.vehicle.v_max = 13.34
     c.scenario.name = 'Intersection'
     c.scenario.kwargs['crossing_style'] = 'Minor'
@@ -93,7 +95,7 @@ if __name__ == '__main__':
         tuner = tune.Tuner(
             "PPO",
             run_config=RunConfig(
-                name=f"PPO_custom_env_{num_maps}_{num_traffic}_{num_tasks}_{args.env_seed}",
+                name=f"PPO_custom_env_{num_maps}_{num_traffic}_{num_tasks}_{args.env_seed}_{args.env_seed_offset}",
                 stop=dict(
                     timesteps_total=args.timesteps,
                 ),

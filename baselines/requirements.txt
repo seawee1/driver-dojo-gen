@@ -3,3 +3,4 @@ torch
 tensorflow_probability
 tensorflow
 tensorboard
+higher  # For MB-MPO

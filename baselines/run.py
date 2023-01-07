@@ -1,4 +1,6 @@
 import argparse
+import os
+import sys
 
 import ray
 from ray import tune, air
@@ -8,6 +10,7 @@ from ray.air import RunConfig
 
 from driver_dojo.core.env import DriverDojoEnv
 
+sys.path.append(os.getcwd() + '/..')
 from env_config import get_env_config
 
 parser = argparse.ArgumentParser()
@@ -39,6 +42,10 @@ if __name__ == '__main__':
     if args.algo == 'PPO':
         from ppo_config import get_config
         config = get_config(args)
+    elif args.algo == 'MBMPO':
+        from mbmpo_config import get_config
+        config = get_config(args)
+        c.actions.space = 'Continuous'
     else:
         raise ValueError("Algo not implemented!")
 

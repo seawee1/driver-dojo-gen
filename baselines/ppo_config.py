@@ -5,6 +5,8 @@ def get_config(args):
     config = PPOConfig()
     config = config.training(
         gamma=0.99,
+        use_critic=True,
+        use_gae=True,
         lambda_=0.95,
         train_batch_size=8192,
         sgd_minibatch_size=256,
@@ -12,6 +14,10 @@ def get_config(args):
         clip_param=0.2,
         num_sgd_iter=20,
         kl_coeff=0.2,
+        kl_target=0.01,
+        vf_loss_coeff=1.0,
+        entropy_coeff=0.0,
+        vf_clip_param=10.0
     )
     config = config.environment(
         env='custom_env',

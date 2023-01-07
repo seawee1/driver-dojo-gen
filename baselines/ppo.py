@@ -101,7 +101,9 @@ if __name__ == '__main__':
                 ),
                 verbose=1,
                 checkpoint_config=air.CheckpointConfig(
-                    checkpoint_frequency=1, checkpoint_at_end=True,
+                    checkpoint_frequency=1,
+                    checkpoint_at_end=True,
+                    num_to_keep=10,
                 ),
             ),
             param_space=config.to_dict(),

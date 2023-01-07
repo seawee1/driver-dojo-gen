@@ -58,6 +58,8 @@ class ClassicControlConfig(BaseMuZeroConfig):
         env_config = get_env_config(self.args)
         env_config.scenario.generation_threading = False  # Pickle issue due to threading
         env = DriverDojoEnv(_config=env_config)
+        # from ray.util import inspect_serializability
+        # print(inspect_serializability(env, depth=10))
         #env = gym.make(self.env_name, new_step_api=True)
 
         if save_video:

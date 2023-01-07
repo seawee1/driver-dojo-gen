@@ -10,7 +10,7 @@ from ray.air import RunConfig
 
 from driver_dojo.core.env import DriverDojoEnv
 
-sys.path.append(os.getcwd() + '/..')
+sys.path.append(os.path.abspath(os.path.dirname(__file__)) + '/..')
 from env_config import get_env_config
 
 parser = argparse.ArgumentParser()

@@ -1,5 +1,4 @@
 import argparse
-import gym
 
 import ray
 from ray import tune, air
@@ -7,11 +6,9 @@ from ray.rllib.algorithms import Algorithm
 from ray.tune.registry import register_env
 from ray.air import RunConfig
 
-from driver_dojo.core.config import Config
 from driver_dojo.core.env import DriverDojoEnv
-from driver_dojo.core.types import *
 
-from env_config import get_env_config
+from baselines.env_config import get_env_config
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--algo", type=str, default="PPO")

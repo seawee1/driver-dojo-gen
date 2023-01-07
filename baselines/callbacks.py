@@ -1,5 +1,6 @@
 from ray.rllib.algorithms.callbacks import DefaultCallbacks
 
+
 class CustomCallback(DefaultCallbacks):
     def on_episode_end(
             self,
@@ -8,7 +9,7 @@ class CustomCallback(DefaultCallbacks):
             base_env,
             policies,
             episode,
-            env_index = None,
+            env_index=None,
             **kwargs,
     ) -> None:
         info_dict = episode.last_info_for()

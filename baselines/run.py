@@ -4,16 +4,17 @@ import gym
 import ray
 from ray import tune, air
 from ray.rllib.algorithms import Algorithm
-from ray.rllib.algorithms.ppo import PPOConfig
 from ray.tune.registry import register_env
 from ray.air import RunConfig
 
 from driver_dojo.core.config import Config
 from driver_dojo.core.env import DriverDojoEnv
 from driver_dojo.core.types import *
-from callbacks import CustomCallback
+
+from env_config import get_env_config
 
 parser = argparse.ArgumentParser()
+parser.add_argument("--algo", type=str, default="PPO")
 parser.add_argument("--num-cpus", type=int, default=24)
 parser.add_argument("--num-gpus", type=int, default=1)
 parser.add_argument("--env-seed", type=int, default=0)
@@ -28,30 +29,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     num_maps, num_traffic, num_tasks = [int(x) for x in args.task.split('_')]
 
-    c = Config()
-    c.actions.space = 'Discretized'
-    c.vehicle.dynamics_model = 'KS'
-    c.simulation.dt = 0.2
-    c.simulation.max_time_steps = 500
-    c.scenario.traffic_init = True
-    c.scenario.traffic_init_spread = 30.0
-    c.scenario.traffic_spawn = True
-    c.scenario.traffic_spawn_period = 1.0
-    c.scenario.behavior_dist = False
-    c.scenario.ego_init = True
-    c.scenario.seed_offset = args.env_seed_offset
-    c.vehicle.v_max = 13.34
-    c.scenario.name = 'Intersection'
-    c.scenario.kwargs['crossing_style'] = 'Minor'
-    c.scenario.tasks = ['L']
-    c.scenario.num_maps = num_maps
-    c.scenario.num_traffic = num_traffic
-    c.scenario.num_tasks = num_tasks
-    c.scenario.generation_threading = True
-
-    if args.no_traffic:
-        c.scenario.traffic_spawn = False
-        c.scenario.traffic_init = False
+    c = get_env_config(args)
 
     def env_creator(x):
         env = DriverDojoEnv(_config=c)
@@ -60,42 +38,21 @@ if __name__ == '__main__':
     register_env('custom_env', env_creator)
 
     ray.init()
-    config = PPOConfig()
-    config = config.training(
-        gamma=0.99,
-        lambda_=0.95,
-        train_batch_size=8192,
-        sgd_minibatch_size=256,
-        lr=0.00005,
-        clip_param=0.2,
-        num_sgd_iter=20,
-        kl_coeff=0.2,
-    )
-    config = config.environment(
-        env='custom_env',
-        disable_env_checking=True
-    )
-    config = config.framework(
-        framework='torch',
-    )
-    config = config.rollouts(
-        num_rollout_workers=args.num_cpus - 1,
-        num_envs_per_worker=1,
-        rollout_fragment_length='auto',
-        horizon=500,
-    )
-    config = config.resources(
-        num_gpus=args.num_gpus,
-    )
-    config = config.callbacks(CustomCallback)
-    config.model['framestack'] = True
-    config.model['fcnet_hiddens'] = [512, 512]
+    if args.algo == 'PPO':
+        from baselines.ppo_config import get_config
+        config = get_config(args)
+    else:
+        raise ValueError("Algo not implemented!")
 
-    if not args.as_test:
+    if args.as_test:
+        assert args.exp_path is not None
+        tuner = tune.Tuner.restore(path=args.exp_path)
+        results = tuner.get_results()
+    else:
         tuner = tune.Tuner(
-            "PPO",
+            args.algo,
             run_config=RunConfig(
-                name=f"PPO_custom_env_{num_maps}_{num_traffic}_{num_tasks}_{args.env_seed}_{args.env_seed_offset}",
+                name=f"{args.algo}_custom_env_{num_maps}_{num_traffic}_{num_tasks}_{args.env_seed}_{args.env_seed_offset}",
                 stop=dict(
                     timesteps_total=1000000000,
                 ),
@@ -113,13 +70,9 @@ if __name__ == '__main__':
             )
         )
         results = tuner.fit()
-    else:
-        assert args.exp_path is not None
-        tuner = tune.Tuner.restore(path=args.exp_path)
-        results = tuner.get_results()
 
+    # Evaluate
     checkpoint = results.get_best_result().checkpoint
-    # Create new Algorithm and restore its state from the last checkpoint.
     algo = Algorithm.from_checkpoint(checkpoint)
 
     for phase in ['train', 'test']:
@@ -161,9 +114,11 @@ if __name__ == '__main__':
                 x.append(info[k])
             if k not in ['road_seed', 'traffic_seed']:
                 result_dict[k] = float(np.mean(x))
+                result_dict[k+'_std'] = float(np.std(x))
             else:
                 result_dict[k] = [int(i) for i in x]
         result_dict['reward'] = float(np.mean(rewards))
+        result_dict['reward_std'] = float(np.std(rewards))
 
         print(phase)
         print(result_dict)
@@ -172,7 +127,5 @@ if __name__ == '__main__':
         with open(os.path.join(results.get_best_result().log_dir, f'results_{phase}.yaml'), 'w') as f:
             yaml.dump(result_dict, f)
 
-
     algo.stop()
-
     ray.shutdown()

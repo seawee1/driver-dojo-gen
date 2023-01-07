@@ -1,7 +1,6 @@
 from ray.rllib.algorithms.ppo import PPOConfig
 from callbacks import CustomCallback
 
-
 def get_config(args):
     config = PPOConfig()
     config = config.training(
@@ -35,3 +34,4 @@ def get_config(args):
     config.model['fcnet_hiddens'] = [512, 512]
 
     return config
+

@@ -8,7 +8,7 @@ from ray.air import RunConfig
 
 from driver_dojo.core.env import DriverDojoEnv
 
-from baselines.env_config import get_env_config
+from env_config import get_env_config
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--algo", type=str, default="PPO")
@@ -35,8 +35,9 @@ if __name__ == '__main__':
     register_env('custom_env', env_creator)
 
     ray.init()
+
     if args.algo == 'PPO':
-        from baselines.ppo_config import get_config
+        from ppo_config import get_config
         config = get_config(args)
     else:
         raise ValueError("Algo not implemented!")

@@ -124,6 +124,8 @@ if __name__ == '__main__':
         # Create the env to do inference in.
         if phase == 'test':
             c.scenario.test_seeding = True
+        else:
+            c.scenario.test_seeding = False
         env = env_creator(None)
         obs = env.reset()
 
@@ -158,8 +160,8 @@ if __name__ == '__main__':
             if k not in ['road_seed', 'traffic_seed']:
                 result_dict[k] = float(np.mean(x))
             else:
-                result_dict[k] = list(x)
-        result_dict['reward'] = np.mean(rewards)
+                result_dict[k] = [int(i) for i in x]
+        result_dict['reward'] = float(np.mean(rewards))
 
         print(phase)
         print(result_dict)

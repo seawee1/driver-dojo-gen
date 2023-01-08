@@ -1,5 +1,5 @@
-gym[classic_control]
 ray[rllib]
+gym[classic_control]
 nevergrad
 numpy
 ray

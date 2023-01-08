@@ -1,0 +1,10 @@
+gym[classic_control]
+ray[rllib]
+nevergrad
+numpy
+ray
+seaborn
+tensorboard
+torch
+aiohttp
+

@@ -25,6 +25,7 @@ parser.add_argument("--task", type=str, default="1_1_1")
 parser.add_argument("--crossing_style", type=str, default='minor')
 parser.add_argument("--tasks", type=str, default='l')
 parser.add_argument("--no-traffic", action="store_true")
+parser.add_argument("--net-size", type=str, default=None)
 
 parser.add_argument("--as-test", action="store_true")
 parser.add_argument("--test-latest", action='store_true')
@@ -72,6 +73,8 @@ if __name__ == '__main__':
         name = f"{args.algo}_custom_env_{num_maps}_{num_traffic}_{num_tasks}_{args.env_seed}_{args.env_seed_offset}_{args.crossing_style}_{args.tasks}"
         if args.behavior_dist:
             name += '_bd'
+        if args.net_size is not None:
+            name += args.net_size
         tuner = tune.Tuner(
             args.algo,
             run_config=RunConfig(

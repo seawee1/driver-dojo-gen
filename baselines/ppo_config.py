@@ -2,6 +2,10 @@ from ray.rllib.algorithms.ppo import PPOConfig
 from callbacks import CustomCallback
 
 def get_config(args):
+    net_size = [512, 512]
+    if args.net_size is not None:
+        net_size = [int(x) for x in args.net_size.split(',')]
+
     config = PPOConfig()
     config = config.training(
         gamma=0.99,
@@ -37,7 +41,9 @@ def get_config(args):
     )
     config = config.callbacks(CustomCallback)
     config.model['framestack'] = True
-    config.model['fcnet_hiddens'] = [512, 512]
+    config.model['fcnet_hiddens'] = net_size
+
+    print(config.model)
 
     return config
 

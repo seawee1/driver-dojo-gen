@@ -5,6 +5,8 @@ from driver_dojo.core.types import *
 
 def get_env_config(args):
     num_maps, num_traffic, num_tasks = [int(x) for x in args.task.split('_')]
+    crossing_style = [str(x) for x in args.crossing_style.split(',')]
+    tasks = [str(x) for x in args.tasks.split(',')]
 
     c = Config()
     c.actions.space = 'Discretized'
@@ -21,8 +23,8 @@ def get_env_config(args):
     c.scenario.seeding_mode = args.env_seeding_mode
     c.vehicle.v_max = 13.34
     c.scenario.name = 'Intersection'
-    c.scenario.kwargs['crossing_style'] = 'Minor'
-    c.scenario.tasks = ['L']
+    c.scenario.kwargs['crossing_style'] = crossing_style
+    c.scenario.tasks = tasks
     c.scenario.num_maps = num_maps
     c.scenario.num_traffic = num_traffic
     c.scenario.num_tasks = num_tasks

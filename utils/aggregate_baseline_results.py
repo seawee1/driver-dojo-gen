@@ -7,7 +7,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('base_path', type=str)
 parser.add_argument('in_path', type=str)
 parser.add_argument('out_path', type=str)
-parser.add_argument('nums', type=list)
+parser.add_argument('nums', type=str)
 
 args = parser.parse_args()
 
@@ -19,7 +19,7 @@ def get_dir_name(x):
 
 result_dict = dict()
 result_dict['n'] = []
-for n in args.num:
+for n in [x for x in args.num.split(',')]:
     result_dict['n'].append(n)
     path = os.path.join(args.base_path, get_dir_name(n), args.in_path)
     with open(path, 'r') as f:

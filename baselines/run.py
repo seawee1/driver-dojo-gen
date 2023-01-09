@@ -16,7 +16,7 @@ from env_config import get_env_config
 parser = argparse.ArgumentParser()
 parser.add_argument("--algo", type=str, default="PPO")
 parser.add_argument("--num-cpus", type=int, default=24)
-parser.add_argument("--num-gpus", type=int, default=1)
+parser.add_argument("--num-gpus", type=float, default=1)
 parser.add_argument("--env-seed", type=int, default=0)
 parser.add_argument("--env-seed-offset", type=int, default=0)
 parser.add_argument("--env-seeding-mode", type=str, default='train')
@@ -54,7 +54,7 @@ if __name__ == '__main__':
         tuner = tune.Tuner.restore(path=args.exp_path)
         results = tuner.get_results()
     else:
-        name = f"{args.algo}_custom_env_{num_maps}_{num_traffic}_{num_tasks}_{args.env_seed}_{args.env_seed_offset}"
+        name = f"{args.algo}_custom_env_{num_maps}_{num_traffic}_{num_tasks}_{args.env_seed}_{args.env_seed_offset}_{args.crossing_style}_{args.tasks}"
         if args.behavior_dist:
             name += '_bd'
         tuner = tune.Tuner(

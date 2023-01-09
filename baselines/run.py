@@ -25,7 +25,9 @@ parser.add_argument("--task", type=str, default="1_1_1")
 parser.add_argument("--crossing_style", type=str, default='minor')
 parser.add_argument("--tasks", type=str, default='l')
 parser.add_argument("--no-traffic", action="store_true")
+
 parser.add_argument("--as-test", action="store_true")
+parser.add_argument("--test-latest", action='store_true')
 parser.add_argument("--exp-path", type=str, default=None)
 parser.add_argument('--num-test', type=int, default=1000)
 
@@ -51,8 +53,21 @@ if __name__ == '__main__':
 
     if args.as_test:
         assert args.exp_path is not None
-        tuner = tune.Tuner.restore(path=args.exp_path)
-        results = tuner.get_results()
+        if args.test_latest:
+            dirs = os.listdir(args.exp_path)
+            d = [x for x in dirs if len(x.split('.')) == 1][0]
+            check = [x.split("_")[1] for x in os.listdir(os.path.join(args.exp_path, d)) if 'checkpoint' in x]
+            check_int = [int(x) for x in check]
+            import numpy as np
+            idx = np.argmax(np.array(check_int))
+            check_dir = f'checkpoint_{check[idx]}'
+
+            from ray.air.checkpoint import Checkpoint
+            checkpoint = Checkpoint.from_directory(os.path.join(args.exp_path, d, check_dir))
+        else:
+            tuner = tune.Tuner.restore(path=args.exp_path)
+            results = tuner.get_results()
+            checkpoint = results.get_best_result().checkpoint
     else:
         name = f"{args.algo}_custom_env_{num_maps}_{num_traffic}_{num_tasks}_{args.env_seed}_{args.env_seed_offset}_{args.crossing_style}_{args.tasks}"
         if args.behavior_dist:
@@ -78,9 +93,9 @@ if __name__ == '__main__':
             )
         )
         results = tuner.fit()
+        checkpoint = results.get_best_result().checkpoint
 
     # Evaluate
-    checkpoint = results.get_best_result().checkpoint
     algo = Algorithm.from_checkpoint(checkpoint)
 
     for phase in ['train', 'test_maps', 'test_traffic']:

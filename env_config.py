@@ -18,6 +18,7 @@ def get_env_config(args):
     c.scenario.behavior_dist = False
     c.scenario.ego_init = True
     c.scenario.seed_offset = args.env_seed_offset
+    c.scenario.seeding_mode = args.env_seeding_mode
     c.vehicle.v_max = 13.34
     c.scenario.name = 'Intersection'
     c.scenario.kwargs['crossing_style'] = 'Minor'

@@ -19,10 +19,11 @@ parser.add_argument("--num-cpus", type=int, default=24)
 parser.add_argument("--num-gpus", type=int, default=1)
 parser.add_argument("--env-seed", type=int, default=0)
 parser.add_argument("--env-seed-offset", type=int, default=0)
+parser.add_argument("--env-seeding-mode", type=str, default='train')
 parser.add_argument("--task", type=str, default="1_1_1")
 parser.add_argument("--no-traffic", action="store_true")
 parser.add_argument("--as-test", action="store_true")
-parser.add_argument("--exp_path", type=str, default=None)
+parser.add_argument("--exp-path", type=str, default=None)
 parser.add_argument('--num-test', type=int, default=1000)
 
 if __name__ == '__main__':
@@ -42,10 +43,6 @@ if __name__ == '__main__':
     if args.algo == 'PPO':
         from ppo_config import get_config
         config = get_config(args)
-    elif args.algo == 'MBMPO':
-        from mbmpo_config import get_config
-        config = get_config(args)
-        c.actions.space = 'Continuous'
     else:
         raise ValueError("Algo not implemented!")
 
@@ -80,12 +77,10 @@ if __name__ == '__main__':
     checkpoint = results.get_best_result().checkpoint
     algo = Algorithm.from_checkpoint(checkpoint)
 
-    for phase in ['train', 'test']:
+    for phase in ['train', 'test_maps', 'test_traffic']:
+        print('Eval', phase)
         # Create the env to do inference in.
-        if phase == 'test':
-            c.scenario.test_seeding = True
-        else:
-            c.scenario.test_seeding = False
+        c.scenario.seeding_mode = phase
         env = env_creator(None)
         obs = env.reset()
 
@@ -118,18 +113,20 @@ if __name__ == '__main__':
             for info in infos:
                 x.append(info[k])
             if k not in ['road_seed', 'traffic_seed']:
-                result_dict[k] = float(np.mean(x))
+                result_dict[k+'_mean'] = float(np.mean(x))
                 result_dict[k+'_std'] = float(np.std(x))
+                result_dict[k+'_median'] = float(np.median(x))
             else:
-                result_dict[k] = [int(i) for i in x]
+                result_dict[k + '_num_unique'] = len(set(x))
         result_dict['reward'] = float(np.mean(rewards))
         result_dict['reward_std'] = float(np.std(rewards))
 
-        print(phase)
+        result_dict['checkpoint_uri'] = str(checkpoint.uri)
+
         print(result_dict)
         import os
         import yaml
-        with open(os.path.join(results.get_best_result().log_dir, f'results_{phase}.yaml'), 'w') as f:
+        with open(os.path.join(str(results.get_best_result().log_dir) + '/..', f'results_{phase}.yaml'), 'w') as f:
             yaml.dump(result_dict, f)
 
     algo.stop()

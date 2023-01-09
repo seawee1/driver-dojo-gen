@@ -20,6 +20,7 @@ parser.add_argument("--num-gpus", type=int, default=1)
 parser.add_argument("--env-seed", type=int, default=0)
 parser.add_argument("--env-seed-offset", type=int, default=0)
 parser.add_argument("--env-seeding-mode", type=str, default='train')
+parser.add_argument("--behavior-dist", action='store_true')
 parser.add_argument("--task", type=str, default="1_1_1")
 parser.add_argument("--no-traffic", action="store_true")
 parser.add_argument("--as-test", action="store_true")
@@ -51,10 +52,13 @@ if __name__ == '__main__':
         tuner = tune.Tuner.restore(path=args.exp_path)
         results = tuner.get_results()
     else:
+        name = f"{args.algo}_custom_env_{num_maps}_{num_traffic}_{num_tasks}_{args.env_seed}_{args.env_seed_offset}"
+        if args.behavior_dist:
+            name += '_bd'
         tuner = tune.Tuner(
             args.algo,
             run_config=RunConfig(
-                name=f"{args.algo}_custom_env_{num_maps}_{num_traffic}_{num_tasks}_{args.env_seed}_{args.env_seed_offset}",
+                name=name,
                 stop=dict(
                     timesteps_total=1000000000,
                 ),

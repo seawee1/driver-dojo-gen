@@ -15,7 +15,7 @@ def get_env_config(args):
     c.scenario.traffic_init_spread = 30.0
     c.scenario.traffic_spawn = True
     c.scenario.traffic_spawn_period = 1.0
-    c.scenario.behavior_dist = False
+    c.scenario.behavior_dist = args.behavior_dist
     c.scenario.ego_init = True
     c.scenario.seed_offset = args.env_seed_offset
     c.scenario.seeding_mode = args.env_seeding_mode

@@ -26,6 +26,7 @@ parser.add_argument("--crossing_style", type=str, default='minor')
 parser.add_argument("--tasks", type=str, default='l')
 parser.add_argument("--no-traffic", action="store_true")
 parser.add_argument("--net-size", type=str, default=None)
+parser.add_argument("--local-dir", type=str, default=None)
 
 parser.add_argument("--as-test", action="store_true")
 parser.add_argument("--test-latest", action='store_true')
@@ -79,6 +80,7 @@ if __name__ == '__main__':
             args.algo,
             run_config=RunConfig(
                 name=name,
+                local_dir='~/ray_results' if args.local_dir is None else args.local_dir,
                 stop=dict(
                     timesteps_total=1000000000,
                 ),

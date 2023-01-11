@@ -28,7 +28,7 @@ def get_env_config(args):
     c.scenario.num_maps = num_maps
     c.scenario.num_traffic = num_traffic
     c.scenario.num_tasks = num_tasks
-    c.scenario.generation_threading = args.no_threading
+    c.scenario.generation_threading = not args.no_threading
 
     if args.no_traffic:
         c.scenario.traffic_spawn = False

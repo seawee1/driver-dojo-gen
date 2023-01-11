@@ -42,6 +42,7 @@ def get_config(args):
     config = config.callbacks(CustomCallback)
     config.model['framestack'] = True
     config.model['fcnet_hiddens'] = net_size
+    config['recreate_failed_workers'] = True
 
     print(config.model)
 

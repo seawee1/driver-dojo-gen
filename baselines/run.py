@@ -27,6 +27,7 @@ parser.add_argument("--tasks", type=str, default='l')
 parser.add_argument("--no-traffic", action="store_true")
 parser.add_argument("--net-size", type=str, default=None)
 parser.add_argument("--local-dir", type=str, default=None)
+parser.add_argument("--no-threading", action='store_true')
 
 parser.add_argument("--as-test", action="store_true")
 parser.add_argument("--test-latest", action='store_true')

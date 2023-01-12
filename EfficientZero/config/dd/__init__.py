@@ -34,8 +34,8 @@ class DDConfig(BaseConfig):
             init_zero=True,
             clip_reward=True,
             # storage efficient
-            cvt_string=True,
-            image_based=True,
+            cvt_string=False,
+            image_based=False,
             # lr scheduler
             lr_warm_up=0.01,
             lr_init=0.2,
